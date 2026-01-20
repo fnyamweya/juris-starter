@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
-    "build:packages": "npm run build --workspace=packages/core --workspace=packages/database --workspace=packages/common",
+    "build:packages": "npm run build --workspace=packages/core --workspace=packages/database --workspace=packages/common --workspace=packages/events",
     "build:services": "npm run build --workspaces --if-present -- --scope='@juris/service-*'",
     "format": "prettier --write \"packages/**/*.ts\" \"apps/**/*.ts\" \"services/**/*.ts\"",
     "lint": "eslint \"packages/**/*.ts\" \"apps/**/*.ts\" \"services/**/*.ts\" --fix",
