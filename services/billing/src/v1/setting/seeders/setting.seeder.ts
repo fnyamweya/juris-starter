@@ -26,11 +26,11 @@ export class SettingSeeder {
       },
       {
         key: 'smtp_username',
-        value: 'arkar1712luffy@gmail.com',
+        value: process.env.SMTP_USERNAME || 'smtp-username@example.com',
       },
       {
         key: 'smtp_password',
-        value: 'jjynxromygsfyxym',
+        value: process.env.SMTP_PASSWORD || '',
       },
       {
         key: 'smtp_from_email',
