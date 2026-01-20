@@ -1,7 +1,7 @@
 {
-  "name": "@juris/shared-common",
+  "name": "@juris/common",
   "version": "0.0.1",
-  "description": "Juris Shared Common - Common utilities, filters, interceptors, and guards",
+  "description": "Juris Common - Common utilities, filters, interceptors, and guards",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "private": true,

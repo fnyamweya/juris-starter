@@ -1,7 +1,7 @@
 {
-  "name": "@juris/service-repo",
+  "name": "@juris/service-vault",
   "version": "0.0.1",
-  "description": "Juris Repo Service - Documents",
+  "description": "Juris Vault Service - Documents",
   "private": true,
   "license": "MIT",
   "scripts": {

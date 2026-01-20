@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
-    "build:packages": "npm run build --workspace=packages/shared-core --workspace=packages/shared-database --workspace=packages/shared-common",
+    "build:packages": "npm run build --workspace=packages/core --workspace=packages/database --workspace=packages/common",
     "build:services": "npm run build --workspaces --if-present -- --scope='@juris/service-*'",
     "format": "prettier --write \"packages/**/*.ts\" \"apps/**/*.ts\" \"services/**/*.ts\"",
     "lint": "eslint \"packages/**/*.ts\" \"apps/**/*.ts\" \"services/**/*.ts\" --fix",
@@ -20,11 +20,15 @@
     "test:cov": "npm run test:cov --workspaces --if-present",
     "start:cias": "npm run start:dev --workspace=services/cias",
     "start:hub": "npm run start:dev --workspace=services/hub",
-    "start:repo": "npm run start:dev --workspace=services/repo",
+    "start:vault": "npm run start:dev --workspace=services/vault",
     "start:comms": "npm run start:dev --workspace=services/comms",
     "start:billing": "npm run start:dev --workspace=services/billing",
     "start:siem": "npm run start:dev --workspace=services/siem",
-    "start:guard": "npm run start:dev --workspace=services/guard"
+    "start:guard": "npm run start:dev --workspace=services/guard",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose build",
+    "docker:logs": "docker-compose logs -f"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

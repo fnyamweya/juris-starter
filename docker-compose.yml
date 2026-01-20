@@ -1,0 +1,341 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: juris-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_MULTIPLE_DATABASES: juris_cias_db,juris_hub_db,juris_vault_db,juris_comms_db,juris_billing_db,juris_siem_db,juris_guard_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init-multiple-databases.sh:/docker-entrypoint-initdb.d/init-multiple-databases.sh
+    ports:
+      - "5432:5432"
+    networks:
+      - juris-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Apache Pulsar (Event Bus)
+  pulsar:
+    image: apachepulsar/pulsar:3.1.0
+    container_name: juris-pulsar
+    restart: unless-stopped
+    command: bin/pulsar standalone
+    environment:
+      PULSAR_MEM: "-Xms256m -Xmx512m"
+    ports:
+      - "6650:6650"   # Pulsar broker
+      - "8080:8080"   # Admin API
+    volumes:
+      - pulsar_data:/pulsar/data
+      - pulsar_conf:/pulsar/conf
+    networks:
+      - juris-network
+    healthcheck:
+      test: ["CMD", "bin/pulsar-admin", "brokers", "healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis (Caching)
+  redis:
+    image: redis:7-alpine
+    container_name: juris-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - juris-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MinIO (S3-compatible storage)
+  minio:
+    image: minio/minio:latest
+    container_name: juris-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports:
+      - "9000:9000"   # API
+      - "9001:9001"   # Console
+    volumes:
+      - minio_data:/data
+    networks:
+      - juris-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # CIAS Service (Platform + Identity)
+  cias:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        SERVICE_NAME: cias
+    container_name: juris-cias
+    restart: unless-stopped
+    environment:
+      - APP_NAME=Juris CIAS Service
+      - PORT=3001
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=juris_cias_db
+      - PULSAR_SERVICE_URL=pulsar://pulsar:6650
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - AWS_ENDPOINT=http://minio:9000
+      - AWS_ACCESS_KEY_ID=minioadmin
+      - AWS_SECRET_ACCESS_KEY=minioadmin123
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      pulsar:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - juris-network
+
+  # Hub Service (Practice Domain)
+  hub:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        SERVICE_NAME: hub
+    container_name: juris-hub
+    restart: unless-stopped
+    environment:
+      - APP_NAME=Juris Hub Service
+      - PORT=3002
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=juris_hub_db
+      - PULSAR_SERVICE_URL=pulsar://pulsar:6650
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - AWS_ENDPOINT=http://minio:9000
+      - AWS_ACCESS_KEY_ID=minioadmin
+      - AWS_SECRET_ACCESS_KEY=minioadmin123
+    ports:
+      - "3002:3002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      pulsar:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - juris-network
+
+  # Vault Service (Documents)
+  vault:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        SERVICE_NAME: vault
+    container_name: juris-vault
+    restart: unless-stopped
+    environment:
+      - APP_NAME=Juris Vault Service
+      - PORT=3003
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=juris_vault_db
+      - PULSAR_SERVICE_URL=pulsar://pulsar:6650
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - AWS_ENDPOINT=http://minio:9000
+      - AWS_ACCESS_KEY_ID=minioadmin
+      - AWS_SECRET_ACCESS_KEY=minioadmin123
+    ports:
+      - "3003:3003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      pulsar:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - juris-network
+
+  # Comms Service (Communications)
+  comms:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        SERVICE_NAME: comms
+    container_name: juris-comms
+    restart: unless-stopped
+    environment:
+      - APP_NAME=Juris Comms Service
+      - PORT=3004
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=juris_comms_db
+      - PULSAR_SERVICE_URL=pulsar://pulsar:6650
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - AWS_ENDPOINT=http://minio:9000
+      - AWS_ACCESS_KEY_ID=minioadmin
+      - AWS_SECRET_ACCESS_KEY=minioadmin123
+    ports:
+      - "3004:3004"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      pulsar:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - juris-network
+
+  # Billing Service (Billing & AR)
+  billing:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        SERVICE_NAME: billing
+    container_name: juris-billing
+    restart: unless-stopped
+    environment:
+      - APP_NAME=Juris Billing Service
+      - PORT=3005
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=juris_billing_db
+      - PULSAR_SERVICE_URL=pulsar://pulsar:6650
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - AWS_ENDPOINT=http://minio:9000
+      - AWS_ACCESS_KEY_ID=minioadmin
+      - AWS_SECRET_ACCESS_KEY=minioadmin123
+    ports:
+      - "3005:3005"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      pulsar:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - juris-network
+
+  # SIEM Service (Search & Analytics)
+  siem:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        SERVICE_NAME: siem
+    container_name: juris-siem
+    restart: unless-stopped
+    environment:
+      - APP_NAME=Juris SIEM Service
+      - PORT=3006
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=juris_siem_db
+      - PULSAR_SERVICE_URL=pulsar://pulsar:6650
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - AWS_ENDPOINT=http://minio:9000
+      - AWS_ACCESS_KEY_ID=minioadmin
+      - AWS_SECRET_ACCESS_KEY=minioadmin123
+    ports:
+      - "3006:3006"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      pulsar:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - juris-network
+
+  # Guard Service (Governance)
+  guard:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        SERVICE_NAME: guard
+    container_name: juris-guard
+    restart: unless-stopped
+    environment:
+      - APP_NAME=Juris Guard Service
+      - PORT=3007
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=juris_guard_db
+      - PULSAR_SERVICE_URL=pulsar://pulsar:6650
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - AWS_ENDPOINT=http://minio:9000
+      - AWS_ACCESS_KEY_ID=minioadmin
+      - AWS_SECRET_ACCESS_KEY=minioadmin123
+    ports:
+      - "3007:3007"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      pulsar:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - juris-network
+
+networks:
+  juris-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  pulsar_data:
+  pulsar_conf:
+  redis_data:
+  minio_data:

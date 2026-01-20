@@ -27,13 +27,13 @@
         "tsConfigPath": "services/hub/tsconfig.json"
       }
     },
-    "repo": {
+    "vault": {
       "type": "application",
-      "root": "services/repo",
+      "root": "services/vault",
       "entryFile": "main",
-      "sourceRoot": "services/repo/src",
+      "sourceRoot": "services/vault/src",
       "compilerOptions": {
-        "tsConfigPath": "services/repo/tsconfig.json"
+        "tsConfigPath": "services/vault/tsconfig.json"
       }
     },
     "comms": {
@@ -72,31 +72,40 @@
         "tsConfigPath": "services/guard/tsconfig.json"
       }
     },
-    "shared-core": {
+    "core": {
       "type": "library",
-      "root": "packages/shared-core",
+      "root": "packages/core",
       "entryFile": "index",
-      "sourceRoot": "packages/shared-core/src",
+      "sourceRoot": "packages/core/src",
       "compilerOptions": {
-        "tsConfigPath": "packages/shared-core/tsconfig.json"
+        "tsConfigPath": "packages/core/tsconfig.json"
       }
     },
-    "shared-database": {
+    "database": {
       "type": "library",
-      "root": "packages/shared-database",
+      "root": "packages/database",
       "entryFile": "index",
-      "sourceRoot": "packages/shared-database/src",
+      "sourceRoot": "packages/database/src",
       "compilerOptions": {
-        "tsConfigPath": "packages/shared-database/tsconfig.json"
+        "tsConfigPath": "packages/database/tsconfig.json"
       }
     },
-    "shared-common": {
+    "common": {
       "type": "library",
-      "root": "packages/shared-common",
+      "root": "packages/common",
       "entryFile": "index",
-      "sourceRoot": "packages/shared-common/src",
+      "sourceRoot": "packages/common/src",
       "compilerOptions": {
-        "tsConfigPath": "packages/shared-common/tsconfig.json"
+        "tsConfigPath": "packages/common/tsconfig.json"
+      }
+    },
+    "events": {
+      "type": "library",
+      "root": "packages/events",
+      "entryFile": "index",
+      "sourceRoot": "packages/events/src",
+      "compilerOptions": {
+        "tsConfigPath": "packages/events/tsconfig.json"
       }
     }
   }
