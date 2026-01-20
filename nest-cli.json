@@ -1,8 +1,103 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "monorepo": true,
+  "root": "services/cias",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": false,
+    "tsConfigPath": "services/cias/tsconfig.json"
+  },
+  "projects": {
+    "cias": {
+      "type": "application",
+      "root": "services/cias",
+      "entryFile": "main",
+      "sourceRoot": "services/cias/src",
+      "compilerOptions": {
+        "tsConfigPath": "services/cias/tsconfig.json"
+      }
+    },
+    "hub": {
+      "type": "application",
+      "root": "services/hub",
+      "entryFile": "main",
+      "sourceRoot": "services/hub/src",
+      "compilerOptions": {
+        "tsConfigPath": "services/hub/tsconfig.json"
+      }
+    },
+    "repo": {
+      "type": "application",
+      "root": "services/repo",
+      "entryFile": "main",
+      "sourceRoot": "services/repo/src",
+      "compilerOptions": {
+        "tsConfigPath": "services/repo/tsconfig.json"
+      }
+    },
+    "comms": {
+      "type": "application",
+      "root": "services/comms",
+      "entryFile": "main",
+      "sourceRoot": "services/comms/src",
+      "compilerOptions": {
+        "tsConfigPath": "services/comms/tsconfig.json"
+      }
+    },
+    "billing": {
+      "type": "application",
+      "root": "services/billing",
+      "entryFile": "main",
+      "sourceRoot": "services/billing/src",
+      "compilerOptions": {
+        "tsConfigPath": "services/billing/tsconfig.json"
+      }
+    },
+    "siem": {
+      "type": "application",
+      "root": "services/siem",
+      "entryFile": "main",
+      "sourceRoot": "services/siem/src",
+      "compilerOptions": {
+        "tsConfigPath": "services/siem/tsconfig.json"
+      }
+    },
+    "guard": {
+      "type": "application",
+      "root": "services/guard",
+      "entryFile": "main",
+      "sourceRoot": "services/guard/src",
+      "compilerOptions": {
+        "tsConfigPath": "services/guard/tsconfig.json"
+      }
+    },
+    "shared-core": {
+      "type": "library",
+      "root": "packages/shared-core",
+      "entryFile": "index",
+      "sourceRoot": "packages/shared-core/src",
+      "compilerOptions": {
+        "tsConfigPath": "packages/shared-core/tsconfig.json"
+      }
+    },
+    "shared-database": {
+      "type": "library",
+      "root": "packages/shared-database",
+      "entryFile": "index",
+      "sourceRoot": "packages/shared-database/src",
+      "compilerOptions": {
+        "tsConfigPath": "packages/shared-database/tsconfig.json"
+      }
+    },
+    "shared-common": {
+      "type": "library",
+      "root": "packages/shared-common",
+      "entryFile": "index",
+      "sourceRoot": "packages/shared-common/src",
+      "compilerOptions": {
+        "tsConfigPath": "packages/shared-common/tsconfig.json"
+      }
+    }
   }
 }

@@ -16,6 +16,26 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@juris/shared-core": ["packages/shared-core/src"],
+      "@juris/shared-core/*": ["packages/shared-core/src/*"],
+      "@juris/shared-database": ["packages/shared-database/src"],
+      "@juris/shared-database/*": ["packages/shared-database/src/*"],
+      "@juris/shared-common": ["packages/shared-common/src"],
+      "@juris/shared-common/*": ["packages/shared-common/src/*"]
+    }
+  },
+  "references": [
+    { "path": "packages/shared-core" },
+    { "path": "packages/shared-database" },
+    { "path": "packages/shared-common" },
+    { "path": "services/cias" },
+    { "path": "services/hub" },
+    { "path": "services/repo" },
+    { "path": "services/comms" },
+    { "path": "services/billing" },
+    { "path": "services/siem" },
+    { "path": "services/guard" }
+  ]
 }
