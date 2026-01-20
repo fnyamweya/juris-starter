@@ -1,6 +1,43 @@
-# NestJS TypeORM Template
+# Juris Legal Practice Management Platform
 
-A comprehensive, production-ready NestJS template with TypeORM, featuring authentication, authorization, activity logging, file uploads, email services, and a powerful CLI for rapid development.
+A comprehensive, production-ready NestJS monorepo for legal practice management, featuring microservices architecture with TypeORM, Apache Pulsar event bus, Docker support, and more.
+
+## 🏗️ Monorepo Structure
+
+```
+juris/
+├── packages/                   # Shared libraries
+│   ├── core/                  # Core utilities, interfaces, DTOs
+│   ├── database/              # Database configurations, base entities
+│   ├── common/                # Common filters, interceptors, utils
+│   └── events/                # Event bus with Apache Pulsar
+├── apps/                      # Frontend applications (future)
+├── services/                  # Microservices
+│   ├── cias/                  # Platform + Identity Service (Port 3001)
+│   ├── hub/                   # Practice Domain Service (Port 3002)
+│   ├── vault/                 # Documents Service (Port 3003)
+│   ├── comms/                 # Communications Service (Port 3004)
+│   ├── billing/               # Billing & AR Service (Port 3005)
+│   ├── siem/                  # Search & Analytics Service (Port 3006)
+│   └── guard/                 # Governance Service (Port 3007)
+├── docker/                    # Docker configurations
+├── docker-compose.yml         # Docker Compose for all services
+├── package.json               # Root package.json with workspaces
+├── tsconfig.json              # Root TypeScript configuration
+└── nest-cli.json              # NestJS CLI monorepo configuration
+```
+
+## 🚀 Microservices
+
+| Service | Description | Port |
+|---------|-------------|------|
+| **cias** | Platform + Identity - Core platform functionality and user identity management | 3001 |
+| **hub** | Practice Domain - Legal practice management features | 3002 |
+| **vault** | Documents - Document management and storage | 3003 |
+| **comms** | Communications - Messaging, notifications, and email | 3004 |
+| **billing** | Billing & AR - Invoicing, payments, and accounts receivable | 3005 |
+| **siem** | Search & Analytics - Search functionality and analytics | 3006 |
+| **guard** | Governance - Compliance, policies, and governance | 3007 |
 
 ## 🚀 Features
 
@@ -8,36 +45,56 @@ A comprehensive, production-ready NestJS template with TypeORM, featuring authen
 
 - **NestJS Framework** - Modern Node.js framework for building scalable server-side applications
 - **TypeORM Integration** - Powerful ORM with PostgreSQL support
+- **Apache Pulsar Event Bus** - Distributed messaging for microservices communication
+- **Docker Support** - Full Docker Compose setup for development and production
 - **JWT Authentication** - Secure authentication with access and refresh tokens
 - **Role-Based Access Control (RBAC)** - Flexible permission system with roles and permissions
 - **Two-Factor Authentication (2FA)** - Enhanced security with TOTP support
-- **Forgot Password** - Secure password reset with email verification
 - **Activity Logging** - Comprehensive user activity tracking and audit trails
-- **File Upload Support** - AWS S3 integration for file storage
+- **File Upload Support** - AWS S3/MinIO integration for file storage
 - **Email Service** - SMTP configuration for transactional emails
-- **Global Exception Handling** - Centralized error handling and logging
-- **Request/Response Interceptors** - Standardized API responses
-- **Validation & Serialization** - Built-in data validation and transformation
-- **Winston Logging** - Advanced logging with daily rotation and multiple transports
-
-### CLI Tools
-
-- **Code Generation** - Powerful CLI for generating modules, services, and controllers
+- **Redis Caching** - High-performance caching layer
+- **Winston Logging** - Advanced logging with daily rotation
 
 ## 📋 Prerequisites
 
 - Node.js (v18 or higher)
-- PostgreSQL database
-- AWS S3 account (for file uploads)
-- SMTP server (for email services)
+- Docker & Docker Compose (recommended)
+- Or manually: PostgreSQL, Apache Pulsar, Redis, MinIO/S3
 
-## 🛠️ Installation
+## 🐳 Quick Start with Docker
+
+The easiest way to run all services:
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd juris
+
+# Start all infrastructure and services
+npm run docker:up
+
+# View logs
+npm run docker:logs
+
+# Stop all services
+npm run docker:down
+```
+
+This starts:
+- PostgreSQL (port 5432)
+- Apache Pulsar (ports 6650, 8080)
+- Redis (port 6379)
+- MinIO (ports 9000, 9001)
+- All 7 microservices (ports 3001-3007)
+
+## 🛠️ Manual Installation
 
 1. **Clone the repository**
 
    ```bash
    git clone <repository-url>
-   cd nestjs-typeorm-api-starter
+   cd juris
    ```
 
 2. **Install dependencies**
@@ -48,164 +105,164 @@ A comprehensive, production-ready NestJS template with TypeORM, featuring authen
 
 3. **Environment Configuration**
 
-   Copy the `.env` file and configure your environment variables:
+   ```bash
+   # Copy root env
+   cp .env.example .env
+   
+   # Copy service envs
+   cp services/cias/.env.example services/cias/.env
+   cp services/hub/.env.example services/hub/.env
+   cp services/vault/.env.example services/vault/.env
+   # ... repeat for other services
+   ```
+
+4. **Build shared packages**
 
    ```bash
-   cp .env.example .env
+   npm run build:packages
    ```
 
-   Update the following variables in your `.env` file:
+5. **Start services**
 
-   ```env
-    # App Config
-    APP_NAME=Nestjs-Typeorm-Postgres
-    APP_KEY=<APP_KEY>
-    PORT=8090
-
-    # Auth Config
-    AUTH_PASSWORD_SALT_ROUNDS=10
-
-    # Database Configuration
-    DB_HOST=localhost
-    DB_PORT=5432
-    DB_USERNAME=postgres
-    DB_PASSWORD=postgres
-    DB_NAME=nestjs_typeorm_postgres_db
-    NODE_ENV=development
-
-    # JWT Configuration
-   JWT_SECRET=74db5010c1cd2989e21f49160e22e014b51625097bb721535c529de2cb97f58d
-   JWT_EXPIRATION=172800000
-   JWT_REFRESH_SECRET=59292b190434a15524d53f2e03df1a5f961d5852ee9ed42b9a4c5f8601b80a81
-   JWT_REFRESH_EXPIRATION=2592000000
-
-    # AWS S3 Configuration
-    AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID>
-    AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY>
-    AWS_REGION=<AWS_REGION>
-    AWS_BUCKET_NAME=<AWS_BUCKET_NAME>
-
-    # Email Configuration
-    EMAIL_FROM_NAME="NestJS TypeORM API Starter"
-
-    # CORS
-    CORS_ORIGINS=http://localhost:3000,http://localhost:5173
+   ```bash
+   npm run start:cias
+   npm run start:hub
+   npm run start:vault
+   npm run start:comms
+   npm run start:billing
+   npm run start:siem
+   npm run start:guard
    ```
 
-4. **Database Setup**
+## 📦 Shared Packages
 
-Create your PostgreSQL database and use the manual migration workflow below to create tables.
+### @juris/core
+Common utilities, interfaces, DTOs, and constants shared across all services.
 
-5. **Start the application**
+```typescript
+import { PaginationDto, SERVICE_NAMES } from '@juris/core';
+```
+
+### @juris/database
+Database configurations and base entities for TypeORM.
+
+```typescript
+import { BaseEntity, createDatabaseConfig } from '@juris/database';
+```
+
+### @juris/common
+Common filters, interceptors, and utility functions.
+
+```typescript
+import { HttpExceptionFilter, ResponseInterceptor, winstonConfig } from '@juris/common';
+```
+
+### @juris/events
+Event bus with Apache Pulsar for microservices communication.
+
+```typescript
+import { EventsModule, PulsarService, EVENT_TOPICS } from '@juris/events';
+
+// In your module
+@Module({
+  imports: [EventsModule.forRoot()],
+})
+export class AppModule {}
+
+// Publishing events
+@Injectable()
+export class UserService {
+  constructor(private readonly pulsarService: PulsarService) {}
+
+  async createUser(data: CreateUserDto) {
+    const user = await this.userRepository.save(data);
+    await this.pulsarService.publish(EVENT_TOPICS.USER_CREATED, user);
+    return user;
+  }
+}
+```
+
+## 📦 NPM Scripts
 
 ```bash
-# Development
-npm run start:dev
-
-# Production
+# Build all workspaces
 npm run build
-npm run start:prod
+
+# Build only shared packages
+npm run build:packages
+
+# Format code
+npm run format
+
+# Lint code
+npm run lint
+
+# Run tests
+npm run test
+
+# Docker commands
+npm run docker:up      # Start all services
+npm run docker:down    # Stop all services
+npm run docker:build   # Rebuild images
+npm run docker:logs    # View logs
+
+# Start individual services
+npm run start:cias
+npm run start:hub
+npm run start:vault
+npm run start:comms
+npm run start:billing
+npm run start:siem
+npm run start:guard
 ```
 
-## 📦 Manual TypeORM Migrations
+## 🔄 Event Bus (Apache Pulsar)
 
-This project uses manual migrations for database schema changes. Synchronize is disabled in the data source to prevent unintended schema updates.
+The platform uses Apache Pulsar for event-driven communication between services.
 
-### Configuration
+### Event Topics
 
-- DataSource: [src/data-source.ts](file:///Users/arkarmin/Desktop/personal-projects/nestjs-typeorm-api-starter/src/data-source.ts)
-- Migrations directory: `src/migrations`
-- Scripts (package.json):
-  - `migration:generate` – generate a migration from current entity changes
-  - `migration:run` – run all pending migrations
-  - `migration:revert` – revert the last executed migration
+```typescript
+EVENT_TOPICS = {
+  // User events
+  USER_CREATED: 'juris.user.created',
+  USER_UPDATED: 'juris.user.updated',
+  
+  // Document events
+  DOCUMENT_CREATED: 'juris.document.created',
+  DOCUMENT_SHARED: 'juris.document.shared',
+  
+  // Billing events
+  INVOICE_CREATED: 'juris.billing.invoice-created',
+  PAYMENT_RECEIVED: 'juris.billing.payment-received',
+  
+  // And more...
+}
+```
 
-### Generate a migration
+### Publishing Events
 
-Run the generate script and pass a name/path for the migration after `--`:
+```typescript
+await this.pulsarService.publish(EVENT_TOPICS.USER_CREATED, {
+  userId: user.id,
+  email: user.email,
+});
+```
+
+## 📦 TypeORM Migrations
 
 ```bash
-# Example: create an Init migration file under src/migrations
+# Navigate to service
+cd services/cias
+
+# Generate migration
 npm run migration:generate -- src/migrations/Init
-```
 
-Notes:
-
-- The path/name after `--` is required; omitting it causes: “Not enough non-option arguments”.
-- Ensure your entities reflect the desired schema before generating.
-
-### Run migrations
-
-```bash
+# Run migrations
 npm run migration:run
-```
 
-If you see “No migrations are pending”, verify your migrations exist under `src/migrations` and the glob in `data-source.ts` is:
-
-```ts
-migrations: [__dirname + '/migrations/*.{ts,js}'];
-```
-
-### Revert the last migration
-
-```bash
+# Revert migration
 npm run migration:revert
-```
-
-### Development tips
-
-- Keep `synchronize: false` for all environments.
-- After editing entities, generate a new migration to track changes.
-- For production deploys, compile the app and run migrations using the same scripts; the CLI uses `ts-node` here, so TypeScript migrations under `src/migrations` are supported.
-- If you move migrations or change their path, update the `migrations` property in the data source accordingly.
-
-### Troubleshooting
-
-- “Not enough non-option arguments”: Add a path/name after `--` when running `migration:generate`.
-- “No migrations are pending”: Confirm migrations are in `src/migrations` and the glob matches; ensure you haven’t already run them.
-- “Unknown argument: migrations/...”: Do not pass a path to `migration:run`; only `migration:generate` expects a path/name.
-
-## 🏗️ Project Structure
-
-```
-src/
-├── activity-log/           # Activity logging module
-│   ├── controllers/        # Activity log controllers
-│   ├── decorators/         # Activity logging decorators
-│   ├── dto/               # Data transfer objects
-│   ├── entities/          # Activity log entities
-│   ├── interceptors/      # Activity logging interceptor
-│   └── services/          # Activity log services
-├── auth/                  # Authentication & authorization
-│   ├── controllers/       # Auth controllers
-│   ├── decorators/        # Auth decorators (permissions, roles)
-│   ├── dto/              # Auth DTOs
-│   ├── entities/         # User, role, permission entities
-│   ├── guards/           # JWT, permissions, roles guards
-│   ├── interfaces/       # Auth interfaces
-│   ├── services/         # Auth services
-│   └── strategies/       # Passport strategies
-├── common/               # Shared utilities and configurations
-│   ├── config/          # Configuration files (logger, etc.)
-│   ├── filters/         # Global exception filters
-│   ├── interceptors/    # Response interceptors
-│   ├── interfaces/      # Common interfaces
-│   └── utils/           # Utility functions (S3, email, response)
-├── setting/             # Application settings module
-│   ├── controllers/     # Settings controllers
-│   ├── dto/            # Settings DTOs
-│   ├── entities/       # Settings entities
-│   └── services/       # Settings services
-├── user/               # User management module
-│   ├── controllers/    # User controllers
-│   ├── dto/           # User DTOs
-│   ├── entities/      # User entities
-│   └── services/      # User services
-├── app.controller.ts   # Main app controller
-├── app.module.ts      # Main app module
-├── app.service.ts     # Main app service
-├── data-source.ts     # TypeORM data source configuration
-└── main.ts           # Application entry point
 ```
 
 ## 🔐 Authentication & Authorization
@@ -213,7 +270,6 @@ src/
 ### Role-Based Access Control
 
 ```typescript
-// Protect routes with permissions
 @RequirePermissions({
   module: PermissionModule.USERS,
   permission: 'create'
@@ -222,108 +278,11 @@ src/
 
 ### Two-Factor Authentication
 
-- Email OTP-based 2FA (optional)
-
-## 📊 Activity Logging
-
-Automatic activity logging with the `@LogActivity` decorator:
-
-```typescript
-@LogActivity({
-  action: ActivityAction.CREATE,
-  description: 'User created successfully',
-  resourceType: 'user',
-  getResourceId: (result: User) => result.id
-})
-async createUser(@Body() createUserDto: CreateUserDto) {
-  // Your logic here
-}
-```
-
-## 🪣 S3 Utilities
-
-AWS S3 integration:
-
-```typescript
-  /**
-   * Generate a presigned URL for a file in S3
-   */
-  async generatePresignedUrl(
-    key: string,
-    expiresIn: number = 3600,
-  ): Promise<string | null> {}
-
-  /**
-   * Check if an object exists in S3
-   */
-  async objectExists(key: string): Promise<boolean> {}
-
-  /**
-   * Upload a file to S3
-   */
-  async uploadFile({
-    key,
-    body,
-    contentType,
-    path,
-    metadata,
-  }: {
-    key: string;
-    body: Buffer | Uint8Array | string;
-    contentType?: string;
-    path?: string;
-    metadata?: Record<string, string>;
-  }): Promise<{ success: boolean; key?: string; error?: string }> {}
-
-  /**
-   * Update an existing file in S3
-   * Note: This method overwrites the existing file with the new content.
-   */
-  async updateFile({
-    oldKey,
-    key,
-    body,
-    contentType,
-    path,
-    metadata,
-  }: {
-    key: string;
-    oldKey: string;
-    body: Buffer | Uint8Array | string;
-    contentType?: string;
-    path?: string;
-    metadata?: Record<string, string>;
-  }): Promise<{ success: boolean; key?: string; error?: string }> {}
-
-  /**
-   * Delete a file from S3
-   */
-  async deleteObject(
-    key: string,
-  ): Promise<{ success: boolean; error?: string }> {...}
-```
-
-## 📧 Email Service
-
-SMTP configuration for sending emails:
-
-```typescript
-// Send two-factor authentication code
-await this.emailServiceUtils.sendTwoFactorCode({...});
-
-// Send forgot password reset code
-await this.emailServiceUtils.sendForgotPasswordResetCode({...});
-```
+- Email OTP-based 2FA support
 
 ## 📝 API Documentation
 
-The template includes standardized API responses:
-
 ### Success Response
-
-```typescript
-return ResponseUtil.success(user, `User retrieved by ID ${id} successfully`);
-```
 
 ```json
 {
@@ -336,82 +295,41 @@ return ResponseUtil.success(user, `User retrieved by ID ${id} successfully`);
 
 ### Paginated Response
 
-```typescript
-return ResponseUtil.paginated(
-  result.data,
-  result.total,
-  result.page,
-  result.limit,
-  'Users retrieved successfully',
-);
-```
-
 ```json
 {
   "success": true,
-  "message": "Data retrieved successfully",
   "data": [...],
   "meta": {
-        "total": 1,
-        "page": 1,
-        "limit": 10,
-        "totalPages": 1
-  },
-  "statusCode": 200,
-  "timestamp": "2025-11-03T15:43:11.561Z"
+    "total": 100,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 10
+  }
 }
 ```
 
-### Error Response
+## 🚀 Production Deployment
 
-```json
-{
-  "success": false,
-  "message": "Error message",
-  "error": "Detailed error information",
-  "statusCode": 400
-}
-```
-
-## 🔧 Configuration
-
-### Database Configuration
-
-The template uses TypeORM with PostgreSQL. Configuration is handled through environment variables with automatic entity discovery.
-
-### CORS Configuration
-
-CORS is configured for development with `localhost:3000`. Update in `main.ts` for production.
-
-### Validation
-
-Global validation is enabled with:
-
-- Whitelist unknown properties
-- Transform incoming data
-- Forbid non-whitelisted properties
-
-## 🚀 Deployment
-
-### Production Build
+### Using Docker
 
 ```bash
-npm run build
-npm run start:prod
+# Build production images
+npm run docker:build
+
+# Start in production mode
+docker-compose -f docker-compose.yml up -d
 ```
 
 ### Environment Variables
 
-Ensure all production environment variables are set:
+Ensure all production environment variables are configured:
 
 - Database credentials
 - JWT secrets
-- AWS S3 configuration
+- Pulsar connection
+- Redis connection
+- AWS S3/MinIO credentials
 - SMTP settings
-
-### Docker Support
-
-The template is Docker-ready. Create a `Dockerfile` and `docker-compose.yml` for containerized deployment.
 
 ## 🤝 Contributing
 
@@ -424,23 +342,6 @@ The template is Docker-ready. Create a `Dockerfile` and `docker-compose.yml` for
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🆘 Support
-
-For support and questions:
-
-- Create an issue in the repository
-- Check the documentation
-- Review the example implementations
-
-## 🔄 Updates
-
-This template is actively maintained with:
-
-- Security updates
-- New features
-- Bug fixes
-- Performance improvements
 
 ---
 

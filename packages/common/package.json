@@ -1,0 +1,27 @@
+{
+  "name": "@juris/common",
+  "version": "0.0.1",
+  "description": "Juris Common - Common utilities, filters, interceptors, and guards",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.879.0",
+    "@aws-sdk/s3-request-presigner": "^3.879.0",
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.0.1",
+    "helmet": "^8.1.0",
+    "nest-winston": "^1.10.2",
+    "nodemailer": "^7.0.6",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "ua-parser-js": "^2.0.4",
+    "winston": "^3.18.3",
+    "winston-daily-rotate-file": "^5.0.0"
+  }
+}

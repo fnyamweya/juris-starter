@@ -16,6 +16,29 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@juris/core": ["packages/core/src"],
+      "@juris/core/*": ["packages/core/src/*"],
+      "@juris/database": ["packages/database/src"],
+      "@juris/database/*": ["packages/database/src/*"],
+      "@juris/common": ["packages/common/src"],
+      "@juris/common/*": ["packages/common/src/*"],
+      "@juris/events": ["packages/events/src"],
+      "@juris/events/*": ["packages/events/src/*"]
+    }
+  },
+  "references": [
+    { "path": "packages/core" },
+    { "path": "packages/database" },
+    { "path": "packages/common" },
+    { "path": "packages/events" },
+    { "path": "services/cias" },
+    { "path": "services/hub" },
+    { "path": "services/vault" },
+    { "path": "services/comms" },
+    { "path": "services/billing" },
+    { "path": "services/siem" },
+    { "path": "services/guard" }
+  ]
 }

@@ -1,7 +1,10 @@
 # compiled output
 /dist
+**/dist
 /node_modules
+**/node_modules
 /build
+**/build
 
 # Logs
 logs
@@ -17,6 +20,7 @@ lerna-debug.log*
 
 # Tests
 /coverage
+**/coverage
 /.nyc_output
 
 # IDEs and editors
@@ -56,3 +60,11 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Package lock files (keep only root)
+packages/*/package-lock.json
+services/*/package-lock.json
+apps/*/package-lock.json
